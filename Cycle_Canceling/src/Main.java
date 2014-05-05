@@ -8,12 +8,16 @@ import java.util.ArrayList;
 public class Main {
 
 	public static void main(String[] args) {
-
+		
+		Graph G = null ;
 		try {
-			read_file() ;
+			G = read_file() ;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		G.print_graph() ;
+		BreadthFirstPath bfs = new BreadthFirstPath(G.get_number_nodes()) ;
+		bfs.bfs(1, 2124, G) ;
 
 		//teste ford
 		/*Graph G = new Graph(6, 10, 1, 1, 0, 0, 0, 0, 20) ;
@@ -276,7 +280,7 @@ public class Main {
 		
 	
 	
-	public static void read_file () throws IOException
+	public static Graph read_file () throws IOException
 	{
 		BufferedReader reader = null;
 		
@@ -289,6 +293,8 @@ public class Main {
 		
 		Graph graph = read_graph_information(reader) ;
 		
-		graph = read_arc_information (reader, graph) ;
+		//graph = 
+		
+		return read_arc_information (reader, graph) ;
 	}
 }

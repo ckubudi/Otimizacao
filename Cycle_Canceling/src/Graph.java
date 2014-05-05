@@ -193,13 +193,21 @@ public class Graph {
 		return _graph.get(in_vertex-1).get(cont) ;
 
 	}*/
+	
+	public void print_graph ()
+	{
+		for(int i = 0; i < number_nodes; i++)
+		{
+			int j = 0 ;
+			System.out.println(_graph.get(i).get_node_number());
+			while(_graph.get(i).get_arc(j) != null)
+			{
+				System.out.println("arc to" + _graph.get(i).get_arc(j).get_in_vertex());
+				j++ ;
+			}
+		}	
+	}
 
 
 
 }
-
-//ArrayList<ArrayList<String>> listOlists = new ArrayList<ArrayList<String>>();
-//ArrayList<String> singleList = new ArrayList<String>();
-//singleList.add("hello");
-//singleList.add("world");
-//listOlists.add(singleList);
