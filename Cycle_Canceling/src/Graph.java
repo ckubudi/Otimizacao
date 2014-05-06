@@ -78,8 +78,8 @@ public class Graph {
     	resGraph = new Graph(numberVertices);
     	for (Edge e : this.edges)
     	{
-    		resGraph.addEdge(e.getOrigem(), e.getDestino(), e.getLowBound(), ( e.getCapacity() - e.getFlow() ) , e.getCost());
-    		resGraph.addEdge(e.getDestino(), e.getOrigem(), e.getLowBound(), e.getFlow() , -e.getCost());
+    		resGraph.addEdge(resGraph.getVertex(e.getOrigem().getId()), resGraph.getVertex(e.getDestino().getId()), e.getLowBound(), ( e.getCapacity() - e.getFlow() ) , e.getCost());
+    		resGraph.addEdge(resGraph.getVertex(e.getDestino().getId()),resGraph.getVertex(e.getOrigem().getId()), e.getLowBound(), e.getFlow() , -e.getCost());
     	}
     }
     
@@ -106,6 +106,7 @@ public class Graph {
     	
     	if(bfsFoundPath)
     		bfs.printBFS(s.getId(), t.getId()) ;
+    	
     	
     	
     }
