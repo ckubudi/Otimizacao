@@ -1,213 +1,115 @@
-import java.util.ArrayList;
+// Este é um exemplo simples de implementação de grafo representado por lista
+// de adjacências
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Queue;
 
 public class Graph {
+    List<Vertex> vertices;
+    List<Edge> edges;
+    List<Vertex> supplyNodes ;
+    List<Vertex> demandNodes ;
+    Graph resGraph ;
+    int numberVertices ;
+    int numberEdges = 0;
 
-	private int number_nodes ;
-	private int number_arcs ;
-	private int number_source_nodes ;
-	private int number_sink_nodes ;
-	private int minimum_arc_cost ;
-	private int maximum_arc_cost ;
-	private int minimum_arc_capacity ;
-	private int maximum_arc_capacity ;
-	private int total_supply ;
-	private ArrayList<Node> _graph ;
-	private ArrayList<Node> list_sink_nodes ;
-	private ArrayList<Node> list_source_nodes ;
+    public Graph(int numVertices) {
+        vertices = new ArrayList<Vertex>();
+        supplyNodes = new ArrayList<Vertex>();
+        demandNodes = new ArrayList<Vertex>();
+        edges = new ArrayList<Edge>();
+        numberVertices = numVertices ;
+        
+    	for (int i = 0 ; i < numVertices ; i++)
+			this.addVertex(i , 0);
+    }
 
-	public Graph (int n_nodes, int n_arcs, int n_source_nodes, int n_sink_nodes, int min_arc_cost, int max_arc_cost, int tot_supply,
-			int min_arc_cap, int max_arc_cap)
-	{
-		number_nodes = n_nodes;
-		number_arcs = n_arcs;
-		number_source_nodes = n_source_nodes ;
-		number_sink_nodes = n_sink_nodes;
-		minimum_arc_cost = min_arc_cost;
-		maximum_arc_cost = max_arc_cost;
-		total_supply = tot_supply;
-		minimum_arc_capacity = min_arc_cap ;
-		maximum_arc_capacity = max_arc_cap ;
-		
-		_graph = new ArrayList<Node>();
-		list_sink_nodes = new ArrayList<Node>() ;
-		list_source_nodes = new ArrayList<Node>() ;
-		
-		for(int i = 0; i < number_nodes; i++)
-		{
-		    _graph.add(new Node(0, i));
-		}		
+    Vertex addVertex(int id, int flow) {
+        Vertex v = new Vertex(id, flow);
+        vertices.add(v);
+        return v;
+    }
 
+    Edge addEdge(Vertex origem, Vertex destino, int lowBound, int cap, int cost) {
+        Edge e = new Edge(origem, destino, lowBound, cap, cost);
+        origem.addAdj(e);
+        edges.add(e);
+        numberEdges++ ;
+        return e;
+    }
 
-	}
-	
-	/*public Graph ()
-	{
-	}
-
-	
-	public void initialize_graph_connections ()
-	{
-		System.out.println("entrou") ;
-		for (int out_vertex = 0; out_vertex < number_nodes; out_vertex++)
-        {
-           for (int in_vertex = 0; in_vertex < number_nodes; in_vertex++)
-           {
-        	   System.out.println(out_vertex) ;
-               graph_connections[out_vertex][in_vertex] = 0;
-           }
+    public String toString() {
+        String r = "";
+        for (Vertex u : vertices) {
+            r += u.getId() + "(flow:" + u.getSupplyDemand() + ") -> ";
+            for (Edge e : u.adj) {
+                Vertex v = e.destino;
+                r += v.getId() + ", ";
+            }
+            r += "\n";
         }
-	}*/
-	
-	/*public void create_residual_graph ()
-	{
-		for(int i = 0; i < number_nodes; i++)
-		{
-			int j = 0 ;
-			while (j < _graph.get(i).size())
-			{
-				int new_arc_cost = - _graph.get(i).get(j).get_cost() ;
-				int new_arc_min_cap = _graph.get(i).get(j).get_minimum_capacity() ;
-				int new_arc_max_cap = _graph.get(i).get(j).get_maximum_capacity() ;
-				int new_arc_in_vertex = _graph.get(i).get(j).get_out_vertex() ;
-				int new_arc_out_vertex = _graph.get(i).get(j).get_in_vertex() ;
-				
-				Arc new_arc = new Arc(new_arc_out_vertex, new_arc_in_vertex, 0, new_arc_min_cap, new_arc_max_cap, new_arc_cost) ;
-				new_arc.set_residual_capacity(new_arc_max_cap - _graph.get(i).get(j).get_residual_capacity()) ;
-				
-				_graph.get(new_arc_out_vertex-1).add(new_arc) ;
-				
-				j++ ;
-			}
-		}
-	}*/
-	
-	/*public void add_graph_connections (int out_vertex, int in_vertex, )
-	{
-		for (int out_vertex = 0; out_vertex < number_nodes; out_vertex++)
-        {
-           for (int in_vertex = 0; in_vertex < number_nodes; in_vertex++)
-           {
-               graph_connections[out_vertex][in_vertex] = 0;
-           }
-        }
-	}*/
-	
-	public int get_number_nodes ()
-	{
-		return number_nodes ;
-	}
-	
-	public int get_number_arcs ()
-	{
-		return number_arcs ;
-	}
-	
-	public int get_number_source_nodes ()
-	{
-		return number_source_nodes ;
-	}
-	
-	public int get_number_sink_nodes ()
-	{
-		return number_sink_nodes ;
-	}
-	
-	public int get_minimum_arc_cost ()
-	{
-		return minimum_arc_cost ;
-	}
-	
-	public int get_maximum_arc_cost ()
-	{
-		return maximum_arc_cost ;
-	}
-	
-	public int get_total_supply ()
-	{
-		return total_supply ;
-	}
-	
-	public int get_minimum_arc_capacity ()
-	{
-		return minimum_arc_capacity ;
-	}
-	
-	public int get_maximum_arc_capacity ()
-	{
-		return maximum_arc_capacity ;
-	}
-	
-	public Node get_node (int vertex)
-	{
-		return _graph.get(vertex-1) ;
-	}
-	
-	public void add_list_sink_nodes(Node new_node)
-	{
-		list_sink_nodes.add(new_node) ;
-	}
-	
-	public void add_list_source_nodes(Node new_node)
-	{
-		list_source_nodes.add(new_node) ;
-	}
-	
-	/*public void set_list_sink_nodes(ArrayList<Node> sink_list)
-	{
-		for(int i = 0; i < sink_list.size(); i++)
-		{
-			list_sink_nodes.add(sink_list.get(i)) ;
-		}
-	}
-	
-	public void set_list_source_nodes(ArrayList<Node> source_list)
-	{
-		for(int i = 0; i < source_list.size(); i++)
-		{
-			list_source_nodes.add(source_list.get(i)) ;
-		}
-	}*/
-	
-	public boolean is_source_node(int vertex)
-	{
-		return list_source_nodes.contains(vertex) ;
-	}
-	
-	
-	public boolean is_sink_node(int vertex)
-	{
-		return list_sink_nodes.contains(vertex) ;
-	}
+        return r;
+    }
+    
+    public Vertex getVertex(int id)
+    {
+    	return vertices.get(id);
+    	
+    }
+    
+    public boolean flowOptCondition()
+    {
+    	int accumFlow = 0;
+    	for (Vertex v : vertices)
+    	{
+    		accumFlow += v.getSupplyDemand() ;
+    	}
+    	
+    	if (accumFlow == 0)
+    		return true ;
+    	else
+    		return false;
+    }
+    
+    public void buildResidualGraph()
+    {
+    	resGraph = new Graph(numberVertices);
+    	for (Edge e : this.edges)
+    	{
+    		resGraph.addEdge(e.getOrigem(), e.getDestino(), e.getLowBound(), ( e.getCapacity() - e.getFlow() ) , e.getCost());
+    		resGraph.addEdge(e.getDestino(), e.getOrigem(), e.getLowBound(), e.getFlow() , -e.getCost());
+    	}
+    }
+    
+    
+    public void setMaxCostFlow()
+    {
+    	//cria nos s e t e arestas respectivas
+    	Vertex s = this.addVertex(numberVertices, 0); 
+    	Vertex t = this.addVertex(numberVertices+1, 0);
+    	numberVertices+=2 ;
+    	int originalEdges = numberEdges ;
+    	boolean bfsFoundPath ;
+    	
+    	for(Vertex v: supplyNodes) //supply is positive
+    		this.addEdge(s, v, 0, v.getSupplyDemand(), 0);
+    	
+    	for(Vertex v: demandNodes) //demand is negative
+    		this.addEdge(v, t, 0, v.getSupplyDemand(), 0);
+    	
+    	this.buildResidualGraph();
+    	
+    	BreadthFirstPath bfs = new BreadthFirstPath(this.numberVertices) ;
+    	bfsFoundPath = bfs.bfs(s.getId(), t.getId(), this.resGraph) ;
+    	
+    	if(bfsFoundPath)
+    		bfs.printBFS(s.getId(), t.getId()) ;
+    	
+    	
+    }
 
-	
-	/*public Arc get_arc (int in_vertex, int out_vertex)
-	{	
-		int cont = 0 ;
-		while (_graph.get(in_vertex-1).get(cont).get_out_vertex() != out_vertex)
-		{
-			if(_graph.get(in_vertex-1).get(cont) == null)
-				return null ;
-			cont++ ;
-		}
-		return _graph.get(in_vertex-1).get(cont) ;
-
-	}*/
-	
-	public void print_graph ()
-	{
-		for(int i = 0; i < number_nodes; i++)
-		{
-			int j = 0 ;
-			System.out.println(_graph.get(i).get_node_number());
-			while(_graph.get(i).get_arc(j) != null)
-			{
-				System.out.println("arc to" + _graph.get(i).get_arc(j).get_in_vertex());
-				j++ ;
-			}
-		}	
-	}
-
-
-
+    
+    
 }

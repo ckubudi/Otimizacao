@@ -14,16 +14,16 @@ public class BreadthFirstPath {
     {
         number_of_vertices = n_vertices;
         queue = new LinkedList<Integer>();
-        parent = new int[number_of_vertices + 1];
-        visited = new boolean[number_of_vertices + 1];
+        parent = new int[number_of_vertices];
+        visited = new boolean[number_of_vertices];
     }
     
 	public boolean bfs(int source, int goal,  Graph G)
     {
         boolean pathFound = false;
-        int destination, element;
-System.out.println("passou0001");
-        for(int vertex = 1; vertex <= G.get_number_nodes(); vertex++)
+        int element;
+
+        for(int vertex = 0; vertex < G.numberVertices; vertex++)
         {
             parent[vertex] = -1;
             visited[vertex] = false;
@@ -37,23 +37,16 @@ System.out.println("passou0001");
         { 
         	
             element = queue.remove();
-            destination = 1;
+            Vertex current = G.getVertex(element);
             
-            while (destination <= G.get_number_nodes())
+            for(Edge e: current.adj)
             {
-            	System.out.println(element);
-            	System.out.println(destination);
-            	Arc elem_dest = G.get_node(element).get_arc(destination) ;
-            	System.out.println("passou");
-            	System.out.println(elem_dest);
-            	
-            	if(elem_dest != null && (elem_dest.get_maximum_capacity()-elem_dest.get_flow() > 0)   && !visited[destination])
+            	if( (e.capacity > 0)  && !visited[e.destino.getId()])
                 {
-                    parent[destination] = element;
-                    queue.add(destination);
-                    visited[destination] = true;
+                    parent[e.destino.getId()] = element;
+                    queue.add(e.destino.getId());
+                    visited[e.destino.getId()] = true;
                 }
-                destination++;
             }
         }
 
@@ -62,6 +55,17 @@ System.out.println("passou0001");
             pathFound = true;
         }
         return pathFound;
+    }
+	
+    public void printBFS(int source, int goal) 
+    {
+    	int vertex = goal ;
+        while(vertex != source)
+        {
+        	System.out.print(vertex + "->") ;
+        	vertex = parent[vertex] ;
+        }
+        System.out.print(vertex);
     }
 	
 }
