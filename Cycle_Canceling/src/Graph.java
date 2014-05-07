@@ -55,7 +55,7 @@ public class Graph {
             r += u.getId() + "(demandSupply:" + u.getSupplyDemand() + ") -> ";
             for (Edge e : u.adj) {
                 Vertex v = e.destino;
-                r += v.getId() + "(flow:" + e.getFlow()  + "/capacity:" + e.getCapacity() +  "),";
+                r += v.getId() + "(flow:" + e.getFlow()  + "/capacity:" + e.getCapacity() + "/cost:" + e.cost + "),";
             }
             r += "\n";
         }
@@ -135,7 +135,7 @@ public class Graph {
 		return bottleneck ;
     }
         
-    public void setMaxCostFlow()
+    public Vertex setMaxCostFlow()
     {
     	//cria nos s e t e arestas respectivas
     	Vertex s = this.addVertex(numberVertices, 0); 
@@ -171,10 +171,17 @@ public class Graph {
     		//System.out.println(resGraph);
     	}
     	
+		System.out.println("Original:");
+		System.out.println(this);
+		System.out.println("Residual:");
+		System.out.println(resGraph);
+    	
     	if(sumBottleneck == maxFlow)
     	{
     		System.out.println("maxFlow: " + maxFlow) ;
     	}
+    	
+    	return s ;
     	
     }
     
