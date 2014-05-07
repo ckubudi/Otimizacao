@@ -17,6 +17,15 @@ public class Vertex {
             adj.add(e);
         }
         
+        Edge getAdj(int goal) {
+        	for(Edge e : adj)
+        	{
+        		if(e.getDestino().getId() == goal)
+        			return e ;
+        	}
+            return null ;
+        }
+        
         public int getId() {
 			return id;
 		}

@@ -9,6 +9,8 @@ public class BreadthFirstPath {
     private Queue<Integer> queue;
     private boolean[] visited;
     int number_of_vertices ;
+    private int source ;
+    private int goal ;
     
     public BreadthFirstPath(int n_vertices)
     {
@@ -22,6 +24,8 @@ public class BreadthFirstPath {
     {
         boolean pathFound = false;
         int element;
+        this.source = source ;
+        this.goal = goal ;
 
         for(int vertex = 0; vertex < G.numberVertices; vertex++)
         {
@@ -57,6 +61,39 @@ public class BreadthFirstPath {
         return pathFound;
     }
 	
+	public int get_source ()
+	{
+		return source ;
+	}
+	
+	public int get_goal ()
+	{
+		return goal ;
+	}
+	
+	public int getBottleneck (Graph G)
+	{
+		int vertex = goal ;
+		int minimumCapacity = G.getVertex(parent[vertex]).getAdj(vertex).getCapacity() ;
+		
+		//System.out.println("minimum capacity para o goal " + minimumCapacity) ;
+		
+        while(parent[vertex] != source)
+        {
+        	vertex = parent[vertex] ;
+        	
+        	minimumCapacity = Math.min(minimumCapacity, G.getVertex(parent[vertex]).getAdj(vertex).getCapacity()) ;
+      	
+        }
+        
+        return minimumCapacity ;
+	}
+	
+	public int getParent (int vertex)
+	{
+		return parent[vertex] ;
+	}
+	
     public void printBFS(int source, int goal) 
     {
     	int vertex = goal ;
@@ -65,7 +102,7 @@ public class BreadthFirstPath {
         	System.out.print(vertex + "->") ;
         	vertex = parent[vertex] ;
         }
-        System.out.print(vertex);
+        System.out.println(vertex);
     }
 	
 }

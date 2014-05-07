@@ -5,6 +5,7 @@ import java.util.List;
 public class Edge {
     Vertex origem;
     Vertex destino;
+    Edge originalEdge ; //only for residual graphs
     int lowBound ;
 	int capacity ;
     int cost ;
@@ -24,8 +25,20 @@ public class Edge {
         this.lowBound = lowBound ;
         this.capacity = capacity ;
         this.cost = cost ;
+        
     }
-    
+
+	Edge(Vertex origem, Vertex destino, int lowBound, int capacity , int cost, Edge originalEdge) {
+        this.origem = origem;
+        this.destino = destino;
+        this.lowBound = lowBound ;
+        this.capacity = capacity ;
+        this.cost = cost ; 
+        this.originalEdge = originalEdge ;
+    }
+
+	
+	
     public Vertex getOrigem() {
 		return origem;
 	}

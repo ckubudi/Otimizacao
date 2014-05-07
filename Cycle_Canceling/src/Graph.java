@@ -40,13 +40,22 @@ public class Graph {
         return e;
     }
 
+    
+    Edge addEdge(Vertex origem, Vertex destino, int lowBound, int cap, int cost, Edge ed) {
+        Edge e = new Edge(origem, destino, lowBound, cap, cost, ed);
+        origem.addAdj(e);
+        edges.add(e);
+        numberEdges++ ;
+        return e;
+    }
+    
     public String toString() {
         String r = "";
         for (Vertex u : vertices) {
-            r += u.getId() + "(flow:" + u.getSupplyDemand() + ") -> ";
+            r += u.getId() + "(demandSupply:" + u.getSupplyDemand() + ") -> ";
             for (Edge e : u.adj) {
                 Vertex v = e.destino;
-                r += v.getId() + ", ";
+                r += v.getId() + "(flow:" + e.getFlow()  + "/capacity:" + e.getCapacity() +  "),";
             }
             r += "\n";
         }
@@ -78,12 +87,54 @@ public class Graph {
     	resGraph = new Graph(numberVertices);
     	for (Edge e : this.edges)
     	{
-    		resGraph.addEdge(resGraph.getVertex(e.getOrigem().getId()), resGraph.getVertex(e.getDestino().getId()), e.getLowBound(), ( e.getCapacity() - e.getFlow() ) , e.getCost());
-    		resGraph.addEdge(resGraph.getVertex(e.getDestino().getId()),resGraph.getVertex(e.getOrigem().getId()), e.getLowBound(), e.getFlow() , -e.getCost());
+    		resGraph.addEdge(resGraph.getVertex(e.getOrigem().getId()), resGraph.getVertex(e.getDestino().getId()), e.getLowBound(), ( e.getCapacity() - e.getFlow() ) , e.getCost(), e);
+    		resGraph.addEdge(resGraph.getVertex(e.getDestino().getId()),resGraph.getVertex(e.getOrigem().getId()), e.getLowBound(), e.getFlow() , -e.getCost(), e);
     	}
     }
     
     
+    private static Edge getEdge(Graph g, int source, int dest)
+    {
+    	Vertex  v = g.getVertex(source) ;
+		return v.getAdj(dest) ;
+    }
+    
+    public int updateGraph(BreadthFirstPath bfs)
+    {
+		int sourceVertexId ;
+		int destVertexId = bfs.get_goal() ;
+		Edge tempEdge ;
+		Edge tempResEdge1, tempResEdge2 ;
+		int bottleneck ;
+		
+		bottleneck = bfs.getBottleneck(resGraph) ;
+		
+		while(destVertexId != bfs.get_source())
+        {
+			sourceVertexId = bfs.getParent(destVertexId) ;
+			
+			//residual Graph
+			tempResEdge1 = Graph.getEdge(resGraph, sourceVertexId, destVertexId);
+			tempResEdge1.capacity -= bottleneck ;
+			
+			tempResEdge2 = Graph.getEdge(resGraph, destVertexId, sourceVertexId);
+			tempResEdge2.capacity += bottleneck ;
+			
+			//original graph
+			tempEdge = Graph.getEdge(this, sourceVertexId, destVertexId) ;
+
+			if (tempEdge.origem == tempResEdge1.origem)
+				tempEdge.flow -= bottleneck ;
+			else
+				tempEdge.flow += bottleneck ;
+			
+			destVertexId = sourceVertexId ;
+					
+        }
+		
+		return bottleneck ;
+    }
+        
     public void setMaxCostFlow()
     {
     	//cria nos s e t e arestas respectivas
@@ -92,24 +143,41 @@ public class Graph {
     	numberVertices+=2 ;
     	int originalEdges = numberEdges ;
     	boolean bfsFoundPath ;
+    	int maxFlow = 0 ;
+    	int sumBottleneck = 0;
     	
     	for(Vertex v: supplyNodes) //supply is positive
+    	{
     		this.addEdge(s, v, 0, v.getSupplyDemand(), 0);
+    		maxFlow += v.getSupplyDemand() ;
+    	}
     	
     	for(Vertex v: demandNodes) //demand is negative
-    		this.addEdge(v, t, 0, v.getSupplyDemand(), 0);
+    	{
+    		this.addEdge(v, t, 0, -v.getSupplyDemand(), 0);
+    		//System.out.println(v.getSupplyDemand()) ;
+    	}
+    
     	
     	this.buildResidualGraph();
     	
     	BreadthFirstPath bfs = new BreadthFirstPath(this.numberVertices) ;
-    	bfsFoundPath = bfs.bfs(s.getId(), t.getId(), this.resGraph) ;
+    	while (bfs.bfs(s.getId(), t.getId(), this.resGraph) )
+    	{
+    		sumBottleneck += updateGraph(bfs) ;
+    		//System.out.println("Original:");
+    		//System.out.println(this);
+    		//System.out.println("Residual:");
+    		//System.out.println(resGraph);
+    	}
     	
-    	if(bfsFoundPath)
-    		bfs.printBFS(s.getId(), t.getId()) ;
-    	
-    	
+    	if(sumBottleneck == maxFlow)
+    	{
+    		System.out.println("maxFlow: " + maxFlow) ;
+    	}
     	
     }
+    
 
     
     
