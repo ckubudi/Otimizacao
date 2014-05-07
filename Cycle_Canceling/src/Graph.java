@@ -134,6 +134,66 @@ public class Graph {
 		
 		return bottleneck ;
     }
+    
+    public void updateTempEdge (Edge tempEdge, Edge tempResEdge1, Edge tempResEdge2, int bottleneck)
+    {
+    	
+    	//original graph
+		tempEdge = Graph.getEdge(this, tempResEdge1.getOrigem().getId(), tempResEdge1.getDestino().getId()) ;
+		if(tempEdge != null)
+		{
+			if (tempEdge.origem == tempResEdge1.origem)
+				tempEdge.flow -= bottleneck ;
+			else
+				tempEdge.flow += bottleneck ;
+		}
+		
+		if(tempEdge == null)
+		{
+			tempEdge = Graph.getEdge(this, tempResEdge1.getDestino().getId(), tempResEdge1.getOrigem().getId()) ;
+			if (tempEdge.origem == tempResEdge2.origem)
+				tempEdge.flow += bottleneck ;
+			else
+				tempEdge.flow -= bottleneck ;
+		}
+		
+    }
+    
+    public void updateGraph(BellmanFord bell)
+    {
+		Edge tempEdge = null ;
+		Edge tempResEdge1, tempResEdge2 ;
+		int bottleneck ;
+		ArrayList<Edge> cycleList ;
+		
+		cycleList = bell.getCycle() ;
+		bottleneck = bell.getBottleneck() ;
+		
+		int i = 1;
+		tempResEdge1 = cycleList.get(cycleList.size()-i);
+    	Vertex firstVertex = tempResEdge1.getOrigem() ;
+
+    	while(tempResEdge1.getDestino() != firstVertex)
+    	{
+    		//residual Graph
+    		tempResEdge1.capacity -= bottleneck ;
+    		tempResEdge2 = Graph.getEdge(resGraph, tempResEdge1.getDestino().getId(), tempResEdge1.getOrigem().getId());
+    		tempResEdge2.capacity += bottleneck ;
+    		
+    		updateTempEdge (tempEdge, tempResEdge1, tempResEdge2, bottleneck) ;
+
+    		i++ ;
+    		tempResEdge1 = cycleList.get(cycleList.size()-i);		
+    	}
+    	
+    	//residual Graph
+		tempResEdge1.capacity -= bottleneck ;
+		tempResEdge2 = Graph.getEdge(resGraph, tempResEdge1.getDestino().getId(), tempResEdge1.getOrigem().getId());
+		tempResEdge2.capacity += bottleneck ;
+		
+		updateTempEdge (tempEdge, tempResEdge1, tempResEdge2, bottleneck) ;
+
+    }
         
     public Vertex setMaxCostFlow()
     {
@@ -183,6 +243,17 @@ public class Graph {
     	
     	return s ;
     	
+    }
+    
+    public int minCostFlow()
+    {
+    	int minCostFlow = 0 ;
+    	for(Edge e : this.edges)
+    	{
+    		minCostFlow += e.cost*e.flow ;
+    	}
+    	
+    	return minCostFlow ;
     }
     
 
