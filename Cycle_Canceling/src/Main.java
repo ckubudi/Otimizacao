@@ -8,24 +8,15 @@ public class Main {
     public static void main(String[] args) throws IOException {
     	FileProcessor fp = new FileProcessor("instancias_trab1/nossoexemplo2.net");
     	Graph g = fp.processFile();
-    	Vertex s ;
     	System.out.println("old\n" + g);
-    	s = g.setMaxCostFlow() ;
-    	System.out.println("s: " + s.getId()) ;
     	BellmanFord bell = new BellmanFord() ;
     	
-    	g.supplyNodes.get(0) ;
-    	//bell.bellmanFord(g.resGraph,0) ;
-    	//bell.getBottleneck() ;
-    	while(!(bell.bellmanFord(g.resGraph, 0)))
+    	g.setMaxCostFlow() ;
+    	System.out.println("new\n" + g);
+    	while(!(bell.bellmanFord(g.resGraph, g.supplyNodes.get(0).getId())))
     	{
-    		System.out.println("update bell") ;
     		g.updateGraph(bell) ;
-    		
-    		System.out.println("Original:");
-    		System.out.println(g);
-    		System.out.println("Residual:");
-    		System.out.println(g.resGraph);
+    		System.out.println("bell\n" + g);
     	}
     	
     	int minCostFlow = g.minCostFlow() ;
@@ -34,5 +25,6 @@ public class Main {
     	//System.out.println(g.flowOptCondition());
     	
     	
+    	System.out.println("final\n" + g);
     }
 }

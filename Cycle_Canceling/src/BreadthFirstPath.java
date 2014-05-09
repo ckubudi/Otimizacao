@@ -7,6 +7,7 @@ public class BreadthFirstPath {
 	
 	private int[] parent;
     private Queue<Integer> queue;
+    private Edge[] edgeTo ;
     private boolean[] visited;
     int number_of_vertices ;
     private int source ;
@@ -17,6 +18,7 @@ public class BreadthFirstPath {
         number_of_vertices = n_vertices;
         queue = new LinkedList<Integer>();
         parent = new int[number_of_vertices];
+        edgeTo = new Edge[number_of_vertices];
         visited = new boolean[number_of_vertices];
     }
     
@@ -48,6 +50,7 @@ public class BreadthFirstPath {
             	if( (e.capacity > 0)  && !visited[e.destino.getId()])
                 {
                     parent[e.destino.getId()] = element;
+                    edgeTo[e.destino.getId()] = e ;
                     queue.add(e.destino.getId());
                     visited[e.destino.getId()] = true;
                 }
@@ -103,6 +106,11 @@ public class BreadthFirstPath {
         	vertex = parent[vertex] ;
         }
         System.out.println(vertex);
+    }
+    
+    public Edge getEdgeTo (int destVertex)
+    {
+    	return this.edgeTo[destVertex] ;
     }
 	
 }

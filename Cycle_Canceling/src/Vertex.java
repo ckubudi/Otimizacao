@@ -37,5 +37,14 @@ public class Vertex {
 		public void setSupplyDemand (int sup_dem) {
 			this.supplyDemand = sup_dem;
 		}
+
+		public Edge getAdjRes(int dest, Edge original) {
+        	for(Edge e : adj)
+        	{
+        		if(e.getDestino().getId() == dest && e.originalEdge == original)
+        			return e ;
+        	}
+            return null ;
+		}
         
     }

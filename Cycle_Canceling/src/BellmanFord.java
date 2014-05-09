@@ -11,11 +11,13 @@ public class BellmanFord {
     private int bottleneck ;
     private int[] distance ;
     private int[] predecessor ;
+    private Edge[] edgeTo ;
     private ArrayList<Edge> cycle ;
+    int c ;
     
     public BellmanFord()
     {
-    	
+    	c = 0 ;
     }
     
     private void setCycle (Graph G, Edge e, int[] predecessor)
@@ -40,12 +42,14 @@ public class BellmanFord {
         while(checked[pred] != true)
         {
         	System.out.println(pred);
-        	cycle.add(G.getVertex(pred).getAdj(goal)) ;
+        	//cycle.add(G.getVertex(pred).getAdj(goal)) ;
+        	cycle.add(edgeTo[goal]) ;
         	checked[pred] = true ;
         	goal = pred ;
         	pred = predecessor[pred] ;
         }
-        cycle.add(G.getVertex(pred).getAdj(goal)) ;
+        //cycle.add(G.getVertex(pred).getAdj(goal)) ;
+        cycle.add(edgeTo[goal]) ;
             
         System.out.println(pred);
 
@@ -63,7 +67,13 @@ public class BellmanFord {
     	{
     		bottleneck = Math.min(bottleneck, e.capacity) ;   	
     		i++ ;
-    		e = cycleList.get(cycleList.size()-i);		
+    		e = cycleList.get(cycleList.size()-i);	
+    		if(e.capacity == 0)
+    		{
+    			System.out.println("cap 0") ;
+    			System.out.println(e.origem.getId()) ;
+    			System.out.println(e.destino.getId()) ;
+    		}
     	}
     	
     	bottleneck = Math.min(bottleneck, e.capacity) ; 
@@ -77,14 +87,16 @@ public class BellmanFord {
     {
     	distance = new int[G.numberVertices];
     	predecessor = new int[G.numberVertices];
+    	edgeTo = new Edge[G.numberVertices] ;
     	boolean changed = false ;
-    	
+    	c = 0 ;
         Arrays.fill(distance, INF);
         distance[source] = 0;
         predecessor[source] = -1 ;
-        
+
         for (int i = 0; i < G.numberVertices-1; ++i)
         {
+        	
         	for (Edge e : G.edges)
         	{
                 if (distance[e.origem.getId()] == INF) continue ;                               
@@ -97,6 +109,7 @@ public class BellmanFord {
         			{
         				distance[e.destino.getId()] = newDistance;
                     	predecessor[e.destino.getId()] = e.origem.getId() ;
+                    	edgeTo[e.destino.getId()] = e ;
                     	changed = true ;
         			}
         		}
@@ -110,22 +123,31 @@ public class BellmanFord {
         {      
         	if (distance[e.origem.getId()] != INF && (distance[e.destino.getId()] > distance[e.origem.getId()] + e.cost) && (e.capacity > 0))
         	{	
-        		//ArrayList<Edge> cycle = null ;
         		System.out.println("Negative edge weight cycles detected!");
         		
         		setCycle (G, e, predecessor) ;
         		setBottleneck (cycle) ;
+        		
+        		if(bottleneck == 0)
+        		{
+            		System.out.println("Original:");
+            		System.out.println(G);
+            		System.out.println("Residual:");
+            		System.out.println(G.resGraph);
+            		System.exit(1) ;
+        		}
         		return false;
         	}
         }
              
-        for (int i = 0; i < distance.length; ++i)
+        /*for (int i = 0; i < distance.length; ++i)
         {
         	if (distance[i] == INF)
         		System.out.println("There's no path between " + source + " and " + i);
         	else
         		System.out.println("The shortest distance between nodes " + source + " and " + i + " is " + distance[i]);
-        }
+        }*/
+        
         
         return true ;
 
