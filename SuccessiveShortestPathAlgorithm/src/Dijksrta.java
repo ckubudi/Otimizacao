@@ -62,8 +62,14 @@ public class Dijksrta {
 		{
 			visited[min] = true; // Marca
 			for (Edge e: graph.getVertex(min).adj) { // Percorre arestas
-				if (e.capacity > 0)
+				if (e.capacity > 0 )
 				{
+					if(e.cost < 0 )
+					{
+						System.out.println("ALERTA! Arco com custo reduzido negativo detectado");
+						System.out.println("Aresta de " + e.origem.getId() + " ate " + e.destino.getId() + " com custo " + e.cost);
+						System.exit(1);
+					}
 					if ( (shortestPath[min] + e.cost) < (shortestPath[e.destino.getId()]) && !visited[e.destino.getId()] ) 
 					{
 						shortestPath[e.destino.getId()] = shortestPath[min] + e.cost;
@@ -83,7 +89,7 @@ public class Dijksrta {
 		Edge edge = edgeTo[destino.getId()] ;
 		if (edge == null)
 		{
-			System.out.println("Erro! Aresta para o demand nula");
+			System.out.println("Erro! Aresta para o vertice " + (sink.getId())  + " demand nula");
 			System.exit(1);
 		}
 		bottleneck = edge.capacity ;

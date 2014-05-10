@@ -52,13 +52,14 @@ public class Graph {
         return e;
     }
     
+        
     public String toString() {
         String r = "";
         for (Vertex u : vertices) {
-            r += (u.getId()+1) + "(demandSupply:" + u.getSupplyDemand() + "/e:" + u.gete() +  "/pi:" + u.getPi() + ") -> ";
+            r += (u.getId()) + "(demandSupply:" + u.getSupplyDemand() + "/e:" + u.gete() +  "/pi:" + u.getPi() + ") -> ";
             for (Edge e : u.adj) {
                 Vertex v = e.destino;
-                r += (v.getId()+1) + "(flow:" + e.getFlow()  + "/capacity:" + e.getCapacity() + "/cost:" + e.cost + "),";
+                r += (v.getId()) + "(flow:" + e.getFlow()  + "/capacity:" + e.getCapacity() + "/cost:" + e.cost + "),"; 	
             }
             r += "\n";
         }
@@ -118,23 +119,35 @@ public class Graph {
     public void shortestPathAlgorithm ()
     {
        	int contadorIteracoes = 0; 
-    	
+       	
+       	Vertex transportation = this.addVertex(numberVertices, 0);
+       	this.numberVertices++ ;
+       	for (Vertex v : vertices)
+       		if (v.getId() != (numberVertices-1))
+       		{
+       			this.addEdge(transportation, v, 0, Integer.MAX_VALUE/5, Integer.MAX_VALUE/5);
+       			this.addEdge(v, transportation, 0, Integer.MAX_VALUE/5, Integer.MAX_VALUE/5);
+
+       		}
+       	
+    	this.buildResidualGraph() ;
+       	
+       	
     	for (Vertex v: resGraph.vertices)
     	{
     		v.setPi(0);
     		v.sete(v.getSupplyDemand());
     	}
+    	
     	while (!(this.resGraph.supplyNodes.isEmpty()))
     	{
     		//System.out.println("Grafo Residual na Iteração numero " + contadorIteracoes + ":\n" + this.resGraph );
-    		System.out.println("Iteracao numero: " + contadorIteracoes) ;
+    		//System.out.println("Iteracao numero: " + contadorIteracoes) ;
     		contadorIteracoes++ ;
     		
     		Vertex sup = this.resGraph.supplyNodes.get(0) ;
     		Vertex dem = this.resGraph.demandNodes.get(0) ;
     		
-    		System.out.println("Id do supply escolhido: " + sup.getId() ) ;
-    		System.out.println("Id do demand escolhido: " + dem.getId() ) ;
     		
     		
     		Dijksrta dijkstra = new Dijksrta (this.resGraph) ;
@@ -144,8 +157,12 @@ public class Graph {
     			v.setPi(v.getPi() - dijkstra.getShortestDistance(v.getId()) ) ;
     		
     		for ( Edge e : resGraph.edges)
-    			e.setCost(e.getCost() - e.getOrigem().getPi() + e.getDestino().getPi()) ;
-    		
+    		{
+    			if (e.originalEdge.getOrigem().getId() == e.getOrigem().getId())
+    				e.setCost(e.originalEdge.cost - e.getOrigem().getPi() + e.getDestino().getPi()) ;
+    			else
+    				e.setCost(-e.originalEdge.cost - e.getOrigem().getPi() + e.getDestino().getPi()) ;
+    		}
     		//dijkstra.printShortestPath();
     		
     		dijkstra.setBottleneck(dem);
@@ -154,7 +171,7 @@ public class Graph {
     		
     		maxFlow =  Math.min(maxFlow, -dem.gete());
     		
-    		System.out.println("Bottleneck final: " + maxFlow);
+    		//System.out.println("Bottleneck final: " + maxFlow);
     		
     		sup.sete(sup.gete() - maxFlow);
     		dem.sete(dem.gete() + maxFlow);
