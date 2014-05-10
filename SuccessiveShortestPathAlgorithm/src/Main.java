@@ -2,19 +2,18 @@ import java.io.IOException;
 
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-    	FileProcessor fp = new FileProcessor("instancias_trab1/nossoexemplo2.net");
-    	Graph g = fp.processFile();
-    	System.out.println("old\n" + g);
+	public static void main(String[] args) throws IOException {
+		FileProcessor fp = new FileProcessor("instancias_trab1/stndrd1.net");
+		Graph g = fp.processFile();
+		System.out.println("Raw Graph\n" + g);
+		
     	g.buildResidualGraph() ;
     	g.shortestPathAlgorithm () ;
-    	System.out.println("new\n" + g);
-    	
+    	System.out.println("MinCostFlow Graph\n" + g);
+    	System.out.println("MinCostFlow Residual Graph\n" + g.resGraph);
+
     	int minCostFlow = g.minCostFlow() ;
-    	System.out.println("minCostFlow: " + minCostFlow);
-    	//System.out.println("new\n" + g);
+    	System.out.println("MinCostFlow value: " + minCostFlow);	 
     	
-    	
-    	//System.out.println("final\n" + g);
-    }
+	}
 }
