@@ -1,10 +1,8 @@
 // Este é um exemplo simples de implementação de grafo representado por lista
 // de adjacências
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Queue;
 
 public class Graph {
     List<Vertex> vertices;
@@ -106,26 +104,14 @@ public class Graph {
     
     
     private void updateTempEdge (Edge tempEdge, Edge tempResEdge1, Edge tempResEdge2, int bottleneck)
-    {
-    	
+    {  	
     	//original graph
 		tempEdge = tempResEdge1.originalEdge ;
-		//if(tempEdge != null)
-		//{
-			if (tempEdge.origem == tempResEdge1.origem)
-				tempEdge.flow += bottleneck ;
-			else
-				tempEdge.flow -= bottleneck ;
-		//}
-		
-		/*if(tempEdge == null)
-		{
-			tempEdge = Graph.getEdge(this, tempResEdge1.getDestino().getId(), tempResEdge1.getOrigem().getId()) ;
-			if (tempEdge.origem == tempResEdge2.origem)
-				tempEdge.flow += bottleneck ;
-			else
-				tempEdge.flow -= bottleneck ;
-		}*/
+
+		if (tempEdge.origem.getId() == tempResEdge1.origem.getId())
+			tempEdge.flow += bottleneck ;
+		else
+			tempEdge.flow -= bottleneck ;
 		
     }
     
@@ -143,29 +129,20 @@ public class Graph {
         {
 			sourceVertexId = bfs.getParent(destVertexId) ;
 			
-			//residual Graph
-			/*
-			tempResEdge1 = Graph.getEdge(resGraph, sourceVertexId, destVertexId);
-			
-			
-			tempResEdge2 = Graph.getEdge(resGraph, destVertexId, sourceVertexId);
-			
-			*/
-			
+			//residual graph
 			tempResEdge1 = bfs.getEdgeTo(destVertexId);
 			tempResEdge1.capacity -= bottleneck ;
 			tempResEdge2 = Graph.getMatchingResidualEdge(resGraph, tempResEdge1.destino.getId(), tempResEdge1.origem.getId(), tempResEdge1.originalEdge);
 			tempResEdge2.capacity += bottleneck ;
 			
 			//original graph
-			//tempEdge = Graph.getEdge(this, sourceVertexId, destVertexId) ;
 			tempEdge = tempResEdge1.originalEdge ;
 			
-			if (tempEdge.origem == tempResEdge1.origem)
-				tempEdge.flow -= bottleneck ;
-			else
+			if (tempEdge.origem.getId() == tempResEdge1.origem.getId())
 				tempEdge.flow += bottleneck ;
-			
+			else
+				tempEdge.flow -= bottleneck ;
+
 			destVertexId = sourceVertexId ;
 					
         }
@@ -214,12 +191,10 @@ public class Graph {
         
     public Vertex setMaxCostFlow()
     {
-    	//cria nos s e t e arestas respectivas
+    	//creates source node s and sink node t
     	Vertex s = this.addVertex(numberVertices, 0); 
     	Vertex t = this.addVertex(numberVertices+1, 0);
     	numberVertices+=2 ;
-    	int originalEdges = numberEdges ;
-    	boolean bfsFoundPath ;
     	int maxFlow = 0 ;
     	int sumBottleneck = 0;
     	
@@ -232,71 +207,63 @@ public class Graph {
     	for(Vertex v: demandNodes) //demand is negative
     	{
     		this.addEdge(v, t, 0, -v.getSupplyDemand(), 0);
-    		//System.out.println(v.getSupplyDemand()) ;
     	}
-    
-    	
+      	
     	this.buildResidualGraph();
     	
     	BreadthFirstPath bfs = new BreadthFirstPath(this.numberVertices) ;
     	while (bfs.bfs(s.getId(), t.getId(), this.resGraph) )
     	{
     		sumBottleneck += updateGraph(bfs) ;
-    		/*System.out.println("Original:");
-    		System.out.println(this);
-    		System.out.println("Residual:");
-    		System.out.println(resGraph);*/
     	}
     	
-		System.out.println("Original:");
-		System.out.println(this);
-		System.out.println("Residual:");
-		System.out.println(resGraph);
-    	
-    	if(sumBottleneck == maxFlow)
+    	if(sumBottleneck != maxFlow)
     	{
-    		System.out.println("maxFlow: " + maxFlow) ;
+    		System.out.println("maxFlow not valid ") ;
+    		System.exit(1) ;
     	}
     	
     	this.removeSupportComponents(s.getId(), t.getId());
-    	resGraph.removeSupportComponents(s.getId(), t.getId());
-    	
+        resGraph.removeSupportComponents(s.getId(), t.getId());
     	
     	return s ;
     	
     }
     
-    private void removeSupportComponents(int sId, int tId) {
-		Vertex s = this.getVertex(sId);
-		Vertex t = this.getVertex(tId);
-    	ArrayList<Edge> removedEdges = new ArrayList<Edge>(); 
+    private void removeSupportComponents(int sId, int tId) 
+    {
+    	Vertex s = this.getVertex(sId);
+    	Vertex t = this.getVertex(tId);
+    	
+    	ArrayList<Edge> removedEdges = new ArrayList<Edge>();
+    	
     	for(Edge e: edges)
     	{
-			if(e.getOrigem() == s || e.getOrigem() == t)
-			{
-				removedEdges.add(e);
-				numberEdges-- ;
-			}
-			else if (e.getDestino() == t || e.getDestino() == s)
-			{
-				e.getOrigem().adj.remove(e);
-				removedEdges.add(e);
-				numberEdges-- ;
-			}
+    		if(e.getOrigem() == s || e.getOrigem() == t)
+    		{
+    			removedEdges.add(e);
+    			numberEdges-- ;
+    		}
+    		else if (e.getDestino() == t || e.getDestino() == s)
+    		{
+    			e.getOrigem().adj.remove(e);
+    			removedEdges.add(e);
+    			numberEdges-- ;
+    		}
     	}
     	
     	for (Edge e : removedEdges)
     		edges.remove(e);
-    	
-    	
-		vertices.remove(s);
-    	vertices.remove(t);
-    	numberVertices -= 2 ;
-	}
-
-	public int minCostFlow()
+    	    
+    	    
+    		vertices.remove(s);
+    		vertices.remove(t);
+    		numberVertices -= 2 ;
+    	}
+    
+	public long minCostFlow()
     {
-    	int minCostFlow = 0 ;
+    	long minCostFlow = 0 ;
     	for(Edge e : this.edges)
     	{
     		minCostFlow += e.cost*e.flow ;
@@ -304,8 +271,5 @@ public class Graph {
     	
     	return minCostFlow ;
     }
-    
-
-    
     
 }

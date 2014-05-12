@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Vector;
 
 public class BellmanFord {
 	
@@ -13,11 +10,9 @@ public class BellmanFord {
     private int[] predecessor ;
     private Edge[] edgeTo ;
     private ArrayList<Edge> cycle ;
-    int c ;
     
     public BellmanFord()
     {
-    	c = 0 ;
     }
     
     private void setCycle (Graph G, Edge e, int[] predecessor)
@@ -33,25 +28,18 @@ public class BellmanFord {
         
         cycle.add(e) ;
         
-		System.out.println(e.destino.getId());
-        System.out.println(e.origem.getId());
-        
         pred = predecessor[e.origem.getId()] ;
+
         goal = e.origem.getId() ;
         
         while(checked[pred] != true)
         {
-        	System.out.println(pred);
-        	//cycle.add(G.getVertex(pred).getAdj(goal)) ;
         	cycle.add(edgeTo[goal]) ;
         	checked[pred] = true ;
         	goal = pred ;
         	pred = predecessor[pred] ;
         }
-        //cycle.add(G.getVertex(pred).getAdj(goal)) ;
         cycle.add(edgeTo[goal]) ;
-            
-        System.out.println(pred);
 
     }
     
@@ -68,89 +56,61 @@ public class BellmanFord {
     		bottleneck = Math.min(bottleneck, e.capacity) ;   	
     		i++ ;
     		e = cycleList.get(cycleList.size()-i);	
-    		if(e.capacity == 0)
-    		{
-    			System.out.println("cap 0") ;
-    			System.out.println(e.origem.getId()) ;
-    			System.out.println(e.destino.getId()) ;
-    		}
     	}
     	
     	bottleneck = Math.min(bottleneck, e.capacity) ; 
     	
-    	System.out.println("bottleneck: " + bottleneck);
-    	//return bottleneck ;
+    	//System.out.println("bottleneck: " + bottleneck);
     }
     
-    @SuppressWarnings("null")
-	public boolean bellmanFord(Graph G, int source)
+    public boolean bellmanFord(Graph G, int source)
     {
     	distance = new int[G.numberVertices];
     	predecessor = new int[G.numberVertices];
     	edgeTo = new Edge[G.numberVertices] ;
     	boolean changed = false ;
-    	c = 0 ;
         Arrays.fill(distance, INF);
+        Arrays.fill(predecessor, -1) ;
+        Arrays.fill(edgeTo, null) ;
         distance[source] = 0;
-        predecessor[source] = -1 ;
 
-        for (int i = 0; i < G.numberVertices-1; ++i)
+        for (int i = 0; i < G.numberVertices-1; i++)
         {
-        	
-        	for (Edge e : G.edges)
+        	for(Edge e : G.edges)
         	{
-                if (distance[e.origem.getId()] == INF) continue ;                               
+        			if (distance[e.origem.getId()] == INF) continue ;                               
 
-        		int newDistance = distance[e.origem.getId()] + e.cost;
+        			int newDistance = distance[e.origem.getId()] + e.cost;
         		
-        		if (newDistance < distance[e.destino.getId()])
-        		{
-        			if(e.capacity > 0)
+        			if (newDistance < distance[e.destino.getId()])
         			{
-        				distance[e.destino.getId()] = newDistance;
-                    	predecessor[e.destino.getId()] = e.origem.getId() ;
-                    	edgeTo[e.destino.getId()] = e ;
-                    	changed = true ;
+        				if(e.capacity > 0)
+        				{
+        					distance[e.destino.getId()] = newDistance;
+        					predecessor[e.destino.getId()] = e.origem.getId() ;
+        					edgeTo[e.destino.getId()] = e ;
+        					changed = true ;
+        				}
         			}
-        		}
-        	}
         	
         	if(changed == false)
         		break ;
+        	}
         }
          
         for (Edge e : G.edges)
         {      
         	if (distance[e.origem.getId()] != INF && (distance[e.destino.getId()] > distance[e.origem.getId()] + e.cost) && (e.capacity > 0))
         	{	
-        		System.out.println("Negative edge weight cycles detected!");
-        		
+        		//Negative edge weight cycles detected!      		
         		setCycle (G, e, predecessor) ;
         		setBottleneck (cycle) ;
-        		
-        		if(bottleneck == 0)
-        		{
-            		System.out.println("Original:");
-            		System.out.println(G);
-            		System.out.println("Residual:");
-            		System.out.println(G.resGraph);
-            		System.exit(1) ;
-        		}
+
         		return false;
         	}
-        }
-             
-        /*for (int i = 0; i < distance.length; ++i)
-        {
-        	if (distance[i] == INF)
-        		System.out.println("There's no path between " + source + " and " + i);
-        	else
-        		System.out.println("The shortest distance between nodes " + source + " and " + i + " is " + distance[i]);
-        }*/
-        
+        }                
         
         return true ;
-
     }
 
 	public int[] getPredecessor() {
@@ -169,6 +129,5 @@ public class BellmanFord {
 	public ArrayList<Edge> getCycle() {
 		return cycle;
 	}
-
 
 }

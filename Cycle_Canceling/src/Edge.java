@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class Edge {
     Vertex origem;
@@ -79,8 +76,5 @@ public class Edge {
 		this.cost = cost;
 	}
 
-
-    
-    
 }
 

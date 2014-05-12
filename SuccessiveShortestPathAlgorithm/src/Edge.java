@@ -1,6 +1,3 @@
-
-
-
 public class Edge {
     Vertex origem;
     Vertex destino;
@@ -37,6 +34,7 @@ public class Edge {
         this.cost = cost ; 
         this.originalEdge = originalEdge ;
         this.flow = 0 ;
+
     }
 
 	

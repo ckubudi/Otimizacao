@@ -79,16 +79,12 @@ public class BreadthFirstPath {
 		int vertex = goal ;
 		int minimumCapacity = G.getVertex(parent[vertex]).getAdj(vertex).getCapacity() ;
 		
-		//System.out.println("minimum capacity para o goal " + minimumCapacity) ;
-		
         while(parent[vertex] != source)
         {
         	vertex = parent[vertex] ;
         	
-        	minimumCapacity = Math.min(minimumCapacity, G.getVertex(parent[vertex]).getAdj(vertex).getCapacity()) ;
-      	
-        }
-        
+        	minimumCapacity = Math.min(minimumCapacity, G.getVertex(parent[vertex]).getAdj(vertex).getCapacity()) ;   	
+        }      
         return minimumCapacity ;
 	}
 	
