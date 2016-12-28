@@ -1,2 +1,1 @@
-Otimizacao
-==========
+Max-flow min-cut algorithms
